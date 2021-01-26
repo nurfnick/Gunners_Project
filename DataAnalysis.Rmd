@@ -1,0 +1,38 @@
+---
+title: "Gunner's Hypothesis"
+author: "Nicholas Jacob"
+date: "1/26/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(readr)
+Google_Trends_Combined_Feb_Mar_2018 <- read_csv("Google_Trends_Combined_Feb_Mar_2018.csv")
+```
+
+## Visualizations
+```{r}
+Google_Trends_Combined_Feb_Mar_2018
+```
+```{r}
+Google_Trends_Combined_Feb_Mar_2018$PCOS_WW
+```
+
+
+```{r}
+ggplot(data = Google_Trends_Combined_Feb_Mar_2018, aes(x = Day,y = PCOS_WW, group = 1)) +
+  geom_path() +
+  xlab("") 
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
