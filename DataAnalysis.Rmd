@@ -8,17 +8,19 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(ggplot2)
+library(outliers)
 library(readr)
+library(changepoint)
+library(tseries)
 Google_Trends_Combined_Feb_Mar_2018 <- read_csv("Google_Trends_Combined_Feb_Mar_2018.csv")
 ```
 
 ## Visualizations
-```{r}
-Google_Trends_Combined_Feb_Mar_2018
+```{r convert_to_dates}
+dates <- as.Date(Google_Trends_Combined_Feb_Mar_2018$Day, "%m/%d/%Y")
+Google_Trends_Combined_Feb_Mar_2018["Day"] = dates
 ```
-```{r}
-Google_Trends_Combined_Feb_Mar_2018$PCOS_WW
-```
+
 
 
 ```{r}
@@ -26,13 +28,69 @@ ggplot(data = Google_Trends_Combined_Feb_Mar_2018, aes(x = Day,y = PCOS_WW, grou
   geom_path() +
   xlab("") 
 ```
-
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{r}
+ggplot(data = Google_Trends_Combined_Feb_Mar_2018,aes(y = PCOS_WW))+
+  geom_boxplot(fill = "#f0421e") +
+  theme_minimal()
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+```{r test_for_outliers}
+
+test <- grubbs.test(Google_Trends_Combined_Feb_Mar_2018$PCOS_WW)
+test
+```
+
+```{r test_for_outliers2}
+
+test <- grubbs.test(Google_Trends_Combined_Feb_Mar_2018$PCOS_WW, opposite = TRUE)
+test
+```
+
+So both are outliers...
+
+```{r}
+acf(Google_Trends_Combined_Feb_Mar_2018$PCOS_WW)
+```
+
+```{r}
+Box.test(Google_Trends_Combined_Feb_Mar_2018$PCOS_WW, type="Ljung-Box")
+```
+
+Box test shows us that there is a non-stationary trend in out time series. (Low $p$ value)
+
+```{r}
+
+adf.test(Google_Trends_Combined_Feb_Mar_2018$PCOS_WW)
+```
+
+```{r}
+cptfn <- function(data, pen) {
+  ans <- cpt.mean(data, test.stat="Normal", method = "PELT", penalty = "Manual", pen.value = pen) 
+  length(cpts(ans)) +1
+}
+ 
+
+# run cptfn for the signal with a known change point
+pen.vals <- seq(0, 500,1)
+elbowplotData <- unlist(lapply(pen.vals, function(p) 
+                  cptfn(data = Google_Trends_Combined_Feb_Mar_2018$PCOS_WW, pen = p)))
+
+plot(pen.vals,elbowplotData,
+     xlab = "PELT penalty parameter",
+     ylab = " ",
+     main = " ")
+
+```
+
+
+```{r}
+
+
+cptm_CP         <- cpt.mean(Google_Trends_Combined_Feb_Mar_2018$PCOS_WW, penalty='Manual',pen.value=200,method='PELT') 
+cpts_CP         <- cpts(cptm_CP) # change point time points
+cpts_CP
+```
+
+```{r}
+Google_Trends_Combined_Feb_Mar_2018[16,]
+```
