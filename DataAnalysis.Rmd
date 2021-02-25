@@ -20,7 +20,7 @@ Google_Trends_Combined_Feb_Mar_2018 <- read_csv("Google_Trends_Combined_Feb_Mar_
 dates <- as.Date(Google_Trends_Combined_Feb_Mar_2018$Day, "%m/%d/%Y")
 Google_Trends_Combined_Feb_Mar_2018["Day"] = dates
 ```
-
+Hi 
 
 
 ```{r}
