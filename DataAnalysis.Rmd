@@ -24,8 +24,9 @@ Google_Trends_Combined_Feb_Mar_2018["Day"] = dates
 
 
 ```{r}
-ggplot(data = Google_Trends_Combined_Feb_Mar_2018, aes(x = Day,y = PCOS_WW, group = 1)) +
+ggplot(data = Google_Trends_Combined_Feb_Mar_2018, aes(x = Day,y = PCOS_US)) +
   geom_path() +
+#  geom_path(y = PCOS_US)+
   xlab("") 
 ```
 ```{r}
